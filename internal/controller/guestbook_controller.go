@@ -36,7 +36,7 @@ type GuestbookReconciler struct {
 	Scheme *runtime.Scheme
 }
 
-const guestbooksFinalizer = "iblog.pro/asura/finalizer"
+const guestbooksFinalizer = "cloudstack.iblog.pro/finalizer"
 
 //+kubebuilder:rbac:groups=cloudstack.iblog.pro,resources=guestbooks,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=cloudstack.iblog.pro,resources=guestbooks/status,verbs=get;update;patch
@@ -71,12 +71,12 @@ func (r *GuestbookReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
         if !controllerutil.ContainsFinalizer(obj, guestbooksFinalizer) {
                 logger.Info("Adding Finalizer")
                 if ok := controllerutil.AddFinalizer(obj, guestbooksFinalizer); !ok {
-                        logger.Info("Failed to add finalizer into the custom resource %v", req.NamespacedName)
+                        logger.Info(fmt.Sprintf("Failed to add finalizer into the custom resource %v", req.NamespacedName))
                         return ctrl.Result{Requeue: true}, nil
                 }
 
                 if err := r.Update(ctx, obj); err != nil {
-                        logger.Info("Failed to update custom resource to add finalizer :%v", req.NamespacedName)
+                        logger.Info(fmt.Sprintf("Failed to update custom resource to add finalizer :%v", req.NamespacedName))
                         return ctrl.Result{}, err
                 }
 
