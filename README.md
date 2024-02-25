@@ -177,10 +177,7 @@ kubectl apply -f install.yaml
 root@node180:~# kubectl apply -f cloudstack_v1_guestbook.yaml
 guestbook.cloudstack.iblog.pro/guestbook-sample created
 
-kubectl apply -f cloudstack_v1_guestbook.yaml -n guestbook-system
-
-
-imagePullPolicy: Always
+kubectl apply -f cloudstack_v1_guestbook.yaml -n cloudstack-system
 
 
 cat <<EOF>cloudstack_v1_guestbook.yaml
