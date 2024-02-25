@@ -235,3 +235,41 @@ I0225 07:09:28.676059       1 guestbook_controller.go:67] POINT 2: Geeting from 
 ........
 
 ```
+
+
+### REAMD Create WebHook
+```
+
+kubebuilder create webhook --group cloudstack --version v1 --kind Guestbook --defaulting --programmatic-validation --force
+
+
+make build-installer IMG=harbor.iblog.pro/test/asura:latest
+
+make docker-build IMG=harbor.iblog.pro/test/asura:latest
+make docker-push IMG=harbor.iblog.pro/test/asura:latest
+
+
+need install certmanager
+
+kubectl apply -f install.yaml
+
+kubectl delete -f cloudstack_v1_guestbook.yaml -n cloudstack-system
+kubectl apply -f cloudstack_v1_guestbook.yaml -n cloudstack-system
+
+kubectl delete -f cloudstack_v1_guestbook.yaml -n cloudstack-system
+
+
+## openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout tls.key -out tls.crt -subj "/CN=foo.bar.com"
+## kubectl create secret tls test-tls --key="tls.key" --cert="tls.crt"
+## openssl s_client -connect $HOST:$PORTNUMBER -servername $SERVERNAME \
+##    | openssl x509
+	
+
+root@node180:~# kubectl logs -n cloudstack-system   pod/cloudstack-controller-manager-7b7cbf695b-gghc4 | grep validate
+2024-02-25T08:58:46Z    INFO    controller-runtime.builder      Registering a validating webhook        {"GVK": "cloudstack.iblog.pro/v1, Kind=Guestbook", "path": "/validate-cloudstack-iblog-pro-v1-guestbook"}
+2024-02-25T08:58:46Z    INFO    controller-runtime.webhook      Registering webhook     {"path": "/validate-cloudstack-iblog-pro-v1-guestbook"}
+2024-02-25T09:01:06Z    INFO    guestbook-resource      validate create {"name": "guestbook-sample"}
+2024-02-25T09:01:06Z    INFO    guestbook-resource      validate update {"name": "guestbook-sample"}
+2024-02-25T09:02:48Z    INFO    guestbook-resource      validate update {"name": "guestbook-sample"}
+
+```
