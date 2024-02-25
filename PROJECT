@@ -7,4 +7,14 @@ layout:
 - go.kubebuilder.io/v4
 projectName: guestbook
 repo: gitlab.iblog.pro/globus/asura
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: iblog.pro
+  group: cloudstack
+  kind: Guestbook
+  path: gitlab.iblog.pro/globus/asura/api/v1
+  version: v1
 version: "3"
