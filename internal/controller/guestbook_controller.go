@@ -24,7 +24,7 @@ import (
         "sigs.k8s.io/controller-runtime/pkg/client"
         "sigs.k8s.io/controller-runtime/pkg/log"
         "sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
-        logger "k8s.io/klog/v2"
+        logf "sigs.k8s.io/controller-runtime/pkg/log"
         "errors"
 
 	cloudstackv1 "gitlab.iblog.pro/globus/asura/api/v1"
@@ -37,6 +37,10 @@ type GuestbookReconciler struct {
 }
 
 const guestbooksFinalizer = "cloudstack.iblog.pro/finalizer"
+
+
+// log is for logging in this package.
+var guestbooklog = logf.Log.WithName("guestbook-resource")
 
 //+kubebuilder:rbac:groups=cloudstack.iblog.pro,resources=guestbooks,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=cloudstack.iblog.pro,resources=guestbooks/status,verbs=get;update;patch
@@ -56,33 +60,33 @@ func (r *GuestbookReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 
 	// TODO(user): your logic here
 
-        logger.Info(fmt.Sprintf("POINT -1: EVENT: %#v\n", ctx))
-        logger.Info(fmt.Sprintf("POINT 0: EVENT: %#v\n", req))
+        guestbooklog.Info(fmt.Sprintf("POINT -1: EVENT: %#v\n", ctx))
+        guestbooklog.Info(fmt.Sprintf("POINT 0: EVENT: %#v\n", req))
 
         obj := &cloudstackv1.Guestbook{}
         if err := r.Get(context.Background(), req.NamespacedName, obj); err != nil {
-                logger.Info(fmt.Sprintf("POINT 1: Unable to fetch object: %v", req.NamespacedName))
+                guestbooklog.Info(fmt.Sprintf("POINT 1: Unable to fetch object: %v", req.NamespacedName))
                 return ctrl.Result{}, nil
         } else {
-                logger.Info(fmt.Sprintf("POINT 2: Geeting from Kubebuilder to %v", obj))
+                guestbooklog.Info(fmt.Sprintf("POINT 2: Geeting from Kubebuilder to %v", obj))
         }
 
 
         if !controllerutil.ContainsFinalizer(obj, guestbooksFinalizer) {
-                logger.Info("Adding Finalizer")
+                guestbooklog.Info("Adding Finalizer")
                 if ok := controllerutil.AddFinalizer(obj, guestbooksFinalizer); !ok {
-                        logger.Info(fmt.Sprintf("Failed to add finalizer into the custom resource %v", req.NamespacedName))
+                        guestbooklog.Info(fmt.Sprintf("Failed to add finalizer into the custom resource %v", req.NamespacedName))
                         return ctrl.Result{Requeue: true}, nil
                 }
 
                 if err := r.Update(ctx, obj); err != nil {
-                        logger.Info(fmt.Sprintf("Failed to update custom resource to add finalizer :%v", req.NamespacedName))
+                        guestbooklog.Info(fmt.Sprintf("Failed to update custom resource to add finalizer :%v", req.NamespacedName))
                         return ctrl.Result{}, err
                 }
 
                 obj.Status.Status = "Running"
                 if err := r.Status().Update(context.Background(), obj); err != nil {
-                        logger.Info(fmt.Sprintf("POINT 3: unable to update status"))
+                        guestbooklog.Info(fmt.Sprintf("POINT 3: unable to update status"))
                         return ctrl.Result{}, err
                 }
         }
@@ -93,21 +97,21 @@ func (r *GuestbookReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
         if isguestbooksMarkedToBeDeleted {
 
                 if controllerutil.ContainsFinalizer(obj, guestbooksFinalizer) {
-                        logger.Info("Performing Finalizer Operations for guestbooks before delete CR")
+                        guestbooklog.Info("Performing Finalizer Operations for guestbooks before delete CR")
 
                         obj.Status.Status = "Deleting"
                         if err := r.Status().Update(context.Background(), obj); err != nil {
-                                logger.Info(fmt.Sprintf("POINT 55: unable to update status"))
+                                guestbooklog.Info(fmt.Sprintf("POINT 55: unable to update status"))
                                 return ctrl.Result{}, err
                         }
 
                         if ok := controllerutil.RemoveFinalizer(obj, guestbooksFinalizer); !ok {
-                                logger.Info("Failed to remove finalizer for guestbooks")
+                                guestbooklog.Info("Failed to remove finalizer for guestbooks")
                                 return ctrl.Result{Requeue: true}, errors.New("Failed to remove finalizer for guestbooks")
                         }
 
                         if err := r.Update(ctx, obj); err != nil {
-                                logger.Info( "Failed to remove finalizer for guestbooks")
+                                guestbooklog.Info( "Failed to remove finalizer for guestbooks")
                                 return ctrl.Result{}, err
                         }
 

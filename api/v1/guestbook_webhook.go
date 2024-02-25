@@ -17,6 +17,7 @@ limitations under the License.
 package v1
 
 import (
+	"fmt"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
@@ -55,6 +56,7 @@ var _ webhook.Validator = &Guestbook{}
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
 func (r *Guestbook) ValidateCreate() (admission.Warnings, error) {
 	guestbooklog.Info("validate create", "name", r.Name)
+	guestbooklog.Info("validate create", "dump", fmt.Sprintf("%#v",r))
 
 	// TODO(user): fill in your validation logic upon object creation.
 	return nil, nil
@@ -63,6 +65,8 @@ func (r *Guestbook) ValidateCreate() (admission.Warnings, error) {
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
 func (r *Guestbook) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
 	guestbooklog.Info("validate update", "name", r.Name)
+	guestbooklog.Info("validate update", "dump new", fmt.Sprintf("%#v",r))
+	guestbooklog.Info("validate update", "dump old", fmt.Sprintf("%#v",old))
 
 	// TODO(user): fill in your validation logic upon object update.
 	return nil, nil
@@ -71,6 +75,7 @@ func (r *Guestbook) ValidateUpdate(old runtime.Object) (admission.Warnings, erro
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
 func (r *Guestbook) ValidateDelete() (admission.Warnings, error) {
 	guestbooklog.Info("validate delete", "name", r.Name)
+	guestbooklog.Info("validate delete", "dumpname", fmt.Sprintf("%#v",r))
 
 	// TODO(user): fill in your validation logic upon object deletion.
 	return nil, nil
