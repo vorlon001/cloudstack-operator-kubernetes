@@ -30,12 +30,18 @@ type GuestbookSpec struct {
 
 	// Foo is an example field of Guestbook. Edit guestbook_types.go to remove/update
 	Foo string `json:"foo,omitempty"`
+        FirstName string `json:"firstname"`
+        LastName  string `json:"lastname"`
+
 }
 
 // GuestbookStatus defines the observed state of Guestbook
 type GuestbookStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+        // INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
+        // Important: Run "make" to regenerate code after modifying this file
+        Status string `json:"Status"`
+        Conditions []metav1.Condition `json:"conditions,omitempty" patchStrategy:"merge" patchMergeKey:"type" protobuf:"bytes,1,rep,name=conditions"`
+
 }
 
 //+kubebuilder:object:root=true
